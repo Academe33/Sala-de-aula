@@ -42,6 +42,7 @@ function showInfo(event) {
         document.getElementById('income').textContent = "";
         document.getElementById('editStudentBtn').style.display = 'none';
     }
+    calculateFinance(); // Atualiza as informações financeiras ao mostrar um aluno
 }
 
 function calculateFinance() {
@@ -59,7 +60,13 @@ function calculateFinance() {
 
 function drawFinancialChart(currentIncome, potentialProfit) {
     const ctx = document.getElementById('financialChart').getContext('2d');
-    new Chart(ctx, {
+
+    // Limpa o gráfico anterior antes de desenhar um novo
+    if (window.myPieChart) {
+        window.myPieChart.destroy();
+    }
+
+    window.myPieChart = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: ['Rendimento Atual', 'Lucro Potencial'],
