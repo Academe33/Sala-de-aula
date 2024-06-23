@@ -33,11 +33,14 @@ function showInfo(event) {
         document.getElementById('grade').textContent = student.grade;
         document.getElementById('contact').textContent = student.contact;
         document.getElementById('income').textContent = `R$ ${student.income},00`;
+        document.getElementById('editStudentBtn').style.display = 'inline-block';
+        document.getElementById('editStudentBtn').dataset.index = index;  // Armazena o índice para referência na edição
     } else {
         document.getElementById('name').textContent = "";
         document.getElementById('grade').textContent = "";
         document.getElementById('contact').textContent = "";
         document.getElementById('income').textContent = "";
+        document.getElementById('editStudentBtn').style.display = 'none';
     }
 }
 
@@ -99,6 +102,7 @@ function removeStudent() {
 function refreshClassroom() {
     createSeats();
     calculateFinance();
+    document.getElementById('editStudentBtn').style.display = 'none';
 }
 
 function handleFileSelect(event) {
@@ -151,6 +155,23 @@ function showRemoveStudentForm() {
         refreshClassroom();
     } else {
         alert("Cadeira inválida.");
+    }
+}
+
+function showEditStudentForm() {
+    const index = parseInt(document.getElementById('editStudentBtn').dataset.index);
+    const student = students[index];
+
+    const name = prompt("Nome do aluno:", student.name);
+    const grade = prompt("Série:", student.grade);
+    const contact = prompt("Contato:", student.contact);
+    const income = parseFloat(prompt("Rendimento:", student.income));
+
+    if (name && grade && contact && !isNaN(income)) {
+        students[index] = { name, grade, contact, income };
+        refreshClassroom();
+    } else {
+        alert("Informações inválidas.");
     }
 }
 
