@@ -1,109 +1,158 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
-    padding: 0;
+const classroom = document.getElementById('classroom');
+let students = [
+    { name: "João", grade: "5ª série", contact: "joao@example.com", income: 1000 },
+    { name: "Maria", grade: "5ª série", contact: "maria@example.com", income: 1000 },
+    { name: "Carlos", grade: "5ª série", contact: "carlos@example.com", income: 1000 },
+    // Adicione mais alunos aqui, até um total de 30
+];
+const monthlyExpense = 3000;
+const maxStudents = 30;
+const studentIncome = 1000;
+
+function createSeats() {
+    classroom.innerHTML = '';  // Limpa os assentos anteriores
+    for (let i = 0; i < 30; i++) {
+        const seat = document.createElement('div');
+        seat.classList.add('seat');
+        if (students[i]) {
+            seat.classList.add('occupied');
+            seat.dataset.index = i;
+        }
+        seat.textContent = i + 1;
+        seat.addEventListener('click', showInfo);
+        classroom.appendChild(seat);
+    }
 }
 
-.container {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+function showInfo(event) {
+    const seat = event.target;
+    const index = seat.dataset.index;
+    if (index !== undefined) {
+        const student = students[index];
+        document.getElementById('name').textContent = student.name;
+        document.getElementById('grade').textContent = student.grade;
+        document.getElementById('contact').textContent = student.contact;
+        document.getElementById('income').textContent = `R$ ${student.income},00`;
+    } else {
+        document.getElementById('name').textContent = "";
+        document.getElementById('grade').textContent = "";
+        document.getElementById('contact').textContent = "";
+        document.getElementById('income').textContent = "";
+    }
 }
 
-h1, h2 {
-    color: #343a40;
-    text-align: center;
+function calculateFinance() {
+    const totalIncome = students.reduce((sum, student) => sum + student.income, 0);
+    const balance = totalIncome - monthlyExpense;
+    const potentialIncome = maxStudents * studentIncome;
+    const potentialProfit = potentialIncome - totalIncome;
+
+    document.getElementById('totalIncome').textContent = `R$ ${totalIncome || 0},00`;
+    document.getElementById('balance').textContent = `R$ ${balance || 0},00`;
+    document.getElementById('potentialProfit').textContent = `R$ ${potentialProfit || 0},00`;
+
+    drawFinancialChart(totalIncome, potentialProfit);
 }
 
-.buttons {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+function drawFinancialChart(currentIncome, potentialProfit) {
+    const ctx = document.getElementById('financialChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Rendimento Atual', 'Lucro Potencial'],
+            datasets: [{
+                label: 'Financeiro',
+                data: [currentIncome, potentialProfit],
+                backgroundColor: ['#28a745', '#ffc107']
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+        }
+    });
 }
 
-button, .import-button {
-    padding: 10px 20px;
-    margin: 10px;
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+function addStudent() {
+    const name = prompt("Nome do aluno:");
+    const grade = prompt("Série:");
+    const contact = prompt("Contato:");
+    const income = parseFloat(prompt("Rendimento:"));
+    if (name && grade && contact && !isNaN(income)) {
+        students.push({ name, grade, contact, income });
+        refreshClassroom();
+    } else {
+        alert("Informações inválidas.");
+    }
 }
 
-button:hover, .import-button:hover {
-    background-color: #0056b3;
+function removeStudent() {
+    const index = parseInt(prompt("Número da cadeira para remover (1-30):")) - 1;
+    if (index >= 0 && index < students.length) {
+        students.splice(index, 1);
+        refreshClassroom();
+    } else {
+        alert("Cadeira inválida.");
+    }
 }
 
-.classroom {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
+function refreshClassroom() {
+    createSeats();
+    calculateFinance();
 }
 
-.seat {
-    width: 80px;
-    height: 80px;
-    background-color: #6c757d;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        const csv = event.target.result;
+        const studentsArray = parseCSV(csv);
+        if (studentsArray.length > 0) {
+            students = studentsArray;
+            refreshClassroom();
+        } else {
+            alert('Erro ao ler arquivo CSV.');
+        }
+    };
+    
+    reader.readAsText(file);
 }
 
-.seat:hover {
-    transform: scale(1.1);
+function parseCSV(csv) {
+    const lines = csv.split('\n');
+    const result = [];
+    for (const line of lines) {
+        const [name, grade, contact, income] = line.split(',');
+        if (name && grade && contact && !isNaN(parseFloat(income))) {
+            result.push({ name, grade, contact, income: parseFloat(income) });
+        }
+    }
+    return result;
 }
 
-.seat.occupied {
-    background-color: #28a745;
+function showAddStudentForm() {
+    const name = prompt("Nome do aluno:");
+    const grade = prompt("Série:");
+    const contact = prompt("Contato:");
+    const income = parseFloat(prompt("Rendimento:"));
+    if (name && grade && contact && !isNaN(income)) {
+        students.push({ name, grade, contact, income });
+        refreshClassroom();
+    } else {
+        alert("Informações inválidas.");
+    }
 }
 
-.info, .finance {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f1f3f5;
-    border-radius: 10px;
+function showRemoveStudentForm() {
+    const index = parseInt(prompt("Número da cadeira para remover (1-30):")) - 1;
+    if (index >= 0 && index < students.length) {
+        students.splice(index, 1);
+        refreshClassroom();
+    } else {
+        alert("Cadeira inválida.");
+    }
 }
 
-.info p, .finance p {
-    margin-bottom: 10px;
-    color: #343a40;
-}
-
-.finance canvas {
-    display: block;
-    margin: 0 auto;
-    max-width: 100%;
-    height: auto;
-}
-
-.input-file {
-    display: none;
-}
-
-label.import-button {
-    padding: 10px 20px;
-    margin: 10px;
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    display: inline-block;
-}
-
-label.import-button:hover {
-    background-color: #0056b3;
-}
+createSeats();
+calculateFinance();
