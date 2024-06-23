@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala de Aula</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sala de Aula</h1>
+        <div class="buttons">
+            <label for="fileInput" class="import-button">Importar Alunos</label>
+            <input type="file" id="fileInput" accept=".csv" class="input-file" onchange="handleFileSelect(event)">
+            <button onclick="showAddStudentForm()">Adicionar Aluno</button>
+            <button onclick="showRemoveStudentForm()">Remover Aluno</button>
+        </div>
+        <div class="classroom" id="classroom"></div>
+        <div class="info" id="info">
+            <h2>Informações do Aluno</h2>
+            <p>Nome: <span id="name"></span></p>
+            <p>Série: <span id="grade"></span></p>
+            <p>Contato do Responsável: <span id="contact"></span></p>
+            <p>Rendimento: <span id="income"></span></p>
+        </div>
+        <div class="finance" id="finance">
+            <h2>Informações Financeiras</h2>
+            <p>Rendimento Total: <span id="totalIncome"></span></p>
+            <p>Despesas Totais: <span id="totalExpenses"></span></p>
+            <p>Saldo: <span id="balance"></span></p>
+            <p>Potencial de Lucro: <span id="potentialProfit"></span></p>
+            <canvas id="financialChart" width="200" height="200"></canvas>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
